@@ -2,8 +2,9 @@ from scipy import ndimage
 from collections import Counter
 from core.vggnet import Vgg19
 from core.utils import *
-
-import tensorflow as tf
+import imageio
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 import numpy as np
 import pandas as pd
 import hickle
@@ -37,7 +38,8 @@ def _process_caption_data(caption_file, image_dir, max_length):
         caption = caption.replace('&','and').replace('(','').replace(")","").replace('-',' ')
         caption = " ".join(caption.split())  # replace multiple spaces
 
-        caption_data.set_value(i, 'caption', caption.lower())
+        # caption_data.set_value(i, 'caption', caption.lower())
+        caption_data.at[i,'caption'] =  caption.lower()
         if len(caption.split(" ")) > max_length:
             del_idx.append(i)
 
@@ -197,8 +199,7 @@ def main():
             for start, end in zip(range(0, n_examples, batch_size),
                                   range(batch_size, n_examples + batch_size, batch_size)):
                 image_batch_file = image_path[start:end]
-                image_batch = np.array(map(lambda x: ndimage.imread(x, mode='RGB'), image_batch_file)).astype(
-                    np.float32)
+                image_batch = np.array(list(map(lambda x:  imageio.imread(x, pilmode='RGB'), image_batch_file))).astype( np.float32)
                 feats = sess.run(vggnet.features, feed_dict={vggnet.images: image_batch})
                 all_feats[start:end, :] = feats
                 print("Processed %d %s features.." % (end, split))

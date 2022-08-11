@@ -1,6 +1,6 @@
-import tensorflow as tf
 import scipy.io
-
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 vgg_layers = ['conv1_1', 'relu1_1', 'conv1_2', 'relu1_2', 'pool1',
               'conv2_1', 'relu2_1', 'conv2_2', 'relu2_2', 'pool2',
